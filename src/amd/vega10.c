@@ -136,9 +136,11 @@ static int amd_vega10_mode1_reset(struct amd_fake_dev *adev)
 
   offset = SOC15_REG_OFFSET(MP0, 0, mmMP0_SMN_C2PMSG_64);
   ret = psp_wait_for(adev, offset, 0x80000000, 0x8000FFFF, false);
-  if (ret)
+  if (ret) {
     vr_warn(adev_to_amd_private(adev)->vdev,
-            "psp not responding, attempting mode1 reset anyway\n");
+            "psp not working for mode1 reset\n");
+    return ret;
+  }
 
   /* save PCI config space */
   for (i = 0; i < 128; i++)
@@ -156,12 +158,14 @@ static int amd_vega10_mode1_reset(struct amd_fake_dev *adev)
   offset = SOC15_REG_OFFSET(MP0, 0, mmMP0_SMN_C2PMSG_33);
   ret = psp_wait_for(adev, offset, 0x80000000, 0x80000000, false);
 
-  if (ret)
+  if (ret) {
     vr_warn(adev_to_amd_private(adev)->vdev,
             "psp mode1 reset completed but PSP not responding\n");
-  else
-    vr_info(adev_to_amd_private(adev)->vdev,
-            "psp mode1 reset succeeded\n");
+    return ret;
+  }
+
+  vr_info(adev_to_amd_private(adev)->vdev,
+          "psp mode1 reset succeeded\n");
 
   return 0;
 }

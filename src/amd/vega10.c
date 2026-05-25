@@ -142,17 +142,9 @@ static int amd_vega10_mode1_reset(struct amd_fake_dev *adev)
     return ret;
   }
 
-  /* save PCI config space */
-  for (i = 0; i < 128; i++)
-    pci_read_config_dword(pdev, i * 4, &pci_regs[i]);
-
   /* send mode 1 reset command to PSP */
   WREG32(offset, GFX_CTRL_CMD_ID_MODE1_RST);
   msleep(500);
-
-  /* restore PCI config space */
-  for (i = 0; i < 128; i++)
-    pci_write_config_dword(pdev, i * 4, pci_regs[i]);
 
   /* check if PSP came back */
   offset = SOC15_REG_OFFSET(MP0, 0, mmMP0_SMN_C2PMSG_33);
